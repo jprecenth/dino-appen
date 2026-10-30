@@ -1,6 +1,6 @@
 import { dinoList } from "@/assets/types/dinodata";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 import asteroids from '../../assets/images/asteroids.png';
 
@@ -19,13 +19,13 @@ export default function GameBox() {
     const router = useRouter();
 
 
-    useEffect(() => {
-        if (!gameStart) {
-            const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5);
-            setDinos(shuffledDinoList);
-            setCurrentIndex(0)
-        }
-    }, [gameStart])
+    // useEffect(() => {
+    //     if (!gameStart) {
+    //         const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5);
+    //         setDinos(shuffledDinoList);
+    //         setCurrentIndex(0)
+    //     }
+    // }, [gameStart])
 
     const handleGuess = () => {
         if (guess.trim() === "") {
@@ -95,7 +95,13 @@ export default function GameBox() {
                         <View className="flex-row w-3/4 justify-between">
                             <Pressable
                                 className="p-4 rounded-xl mr-5 bg-orange-100 flex-grow items-center"
-                                onPress={() => setGameStart(false)}
+                                onPress={() => {
+                                    const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5);
+                                    setDinos(shuffledDinoList);
+                                    setCurrentIndex(0)
+                                    setGameStart(false)
+                                }
+                                }
                             >
                                 <Text className="text-2xl font-bold">
                                     Vi kör!
@@ -119,8 +125,8 @@ export default function GameBox() {
                             Resultat
                         </Text>
                         <Image
-                        source={asteroids}
-                        className="h-[100px] w-[100px]"
+                            source={asteroids}
+                            className="h-[100px] w-[100px]"
                         />
                         <Text className="text-2xl">
                             Du fick {points} poäng!

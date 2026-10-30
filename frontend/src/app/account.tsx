@@ -74,7 +74,11 @@ export default function Account() {
                       <>
                       <View className="flex-row flex-wrap">
                         {dinoList.map((dino) => (
-                          <View className="w-1/3 p-2" style={{ position: "relative" }}>
+                          <View 
+                          className="w-1/3 p-2" 
+                          style={{ position: "relative" }}
+                          key={dino.dinoID}
+                          >
                             <View className="flex-1">
                               <View className="rounded-xl bg-orange-100 p-4 items-center aspect-square">
                                 <Image
