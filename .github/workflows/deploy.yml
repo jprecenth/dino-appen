@@ -137,4 +137,4 @@ jobs:
                 script: |
                     cd /home/ubuntu/dino-appen
                     git pull
-                    sudo --preserve-env=JWT_SECRET docker compose up -d mysql
+                    sudo --preserve-env=JWT_SECRET docker compose up --build -d express
