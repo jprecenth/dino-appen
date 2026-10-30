@@ -1,0 +1,48 @@
+services:
+  nextjs:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://ec2-13-63-161-131.eu-north-1.compute.amazonaws.com:3001
+    ports:
+      - "3000:3000"
+
+  express:
+    build:
+      context: ./backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: dinos_app
+      DB_PASSWORD: dinos_password
+      DB_NAME: dinos
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dinos
+      MYSQL_USER: dinos_app
+      MYSQL_PASSWORD: dinos_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  mysql-data:
