@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS sessions (
   token VARCHAR(512) NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userID) REFERENCES users(userID)
-
 );
 
 CREATE TABLE IF NOT EXISTS favourites (

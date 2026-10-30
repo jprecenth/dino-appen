@@ -26,10 +26,12 @@ export default function Login() {
                         <TextInput
                             className='bg-orange-100 rounded-xl text-center h-20 mt-5 text-xl'
                             placeholder='Användarnamn'
+                            id='username'
                         />
                         <TextInput
                             className='bg-orange-100 rounded-xl text-center h-20 mt-3 text-xl'
                             placeholder='Lösenord'
+                            id='password'
                         />
 
                     </View>

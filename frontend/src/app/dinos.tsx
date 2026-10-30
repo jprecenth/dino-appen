@@ -3,11 +3,19 @@ import BackButton from '@/src/components/backButton';
 import DinoCard from '@/src/components/dinoCard';
 import Footer from '@/src/components/footer';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, useRouter } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { API_URL } from "../config/api"
 
 export default function Dinos() {
-  const router = useRouter();
+  async function testConnection() {
+
+    const response = await fetch(`${API_URL}/healthy`);
+    const data = await response.text();
+    
+    console.log(data)
+  }
+  testConnection()
+
   return (
     <View className="flex-1">
       <LinearGradient
