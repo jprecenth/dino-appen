@@ -88,7 +88,7 @@ export default function Dinos() {
           contentContainerStyle={{
             paddingBottom: 180,
           }}>
-          <View className='flex-1 items-center p-4'>
+          <View className='flex-1 items-center pb-[45px] p-4'>
             <BackButton />
             <Text className='font-kablammo text-6xl pt-20 pb-5'>
               Dinos

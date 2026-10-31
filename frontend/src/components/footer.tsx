@@ -11,7 +11,7 @@ export default function Footer() {
         <View>
             {pathName === '/game'
                 ?
-                <View className="flex-row bottom-0 absolute w-full bg-orange-200 justify-between">
+                <View className="flex-row bottom-0 absolute w-full bg-orange-200 justify-between pb-[45px]">
                     <Link href={'/dinos'} asChild>
                         <Pressable
                             className='m-6 p-4 ml-6 rounded-xl items-center bg-orange-100'>
@@ -42,7 +42,7 @@ export default function Footer() {
                     </Link>
                 </View>
                 :
-                <View className="flex-row bottom-0 absolute w-full bg-orange-200 justify-between">
+                <View className="flex-row bottom-0 absolute w-full bg-orange-200 justify-between pb-[45px]">
                     <Link href={'/dinos'} asChild>
                         <Pressable
                             className={`m-6 p-4 ml-6 rounded-xl items-center ${pathName === '/dinos'

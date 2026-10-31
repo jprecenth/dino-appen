@@ -40,7 +40,7 @@ export default function Login() {
     }
 
     return (
-        <View className="flex-1 bg-orange-200">
+        <View className="flex-1 bg-orange-200 pb-[45px]">
             <ScrollView
                 contentContainerStyle={{
                     paddingBottom: 180,

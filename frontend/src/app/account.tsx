@@ -3,7 +3,7 @@ import BackButton from '@/src/components/backButton';
 import Footer from '@/src/components/footer';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
-import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import emptyheart from '../../assets/images/heart-empty.png';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
@@ -18,6 +18,8 @@ export default function Account() {
   }
   const [jwtToken, setJwtToken] = auth;
   const [accountData, setAccountData] = useState<AccountData | null>(null);
+  const [showEditing, setShowEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
 
   useEffect(() => {
     async function showAccountDetails() {
@@ -45,12 +47,36 @@ export default function Account() {
     showAccountDetails()
   }, [jwtToken])
 
+  async function updateUsername() {
+    const data = { newUserName: newUsername };
+    const response = await fetch(`${API_URL}/account/username`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${jwtToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data)
+    },)
+    if (response.ok) {
+      setAccountData((current) =>
+        current ? { ...current, username: newUsername.trim() } : current
+      );
+      setShowEditing(false);
+      setNewUsername("");
+      Alert.alert(`Ditt användarnamn är nu uppdaterat till ${newUsername.trim()}!`)
+    }
+    else {
+      const error = await response.text();
+      Alert.alert("Ett fel uppstod:", error)
+    }
+  }
+
   function handleSignOut() {
     setJwtToken("")
+    Alert.alert("Du är nu utloggad!")
     setAccountData(null);
     router.replace("/")
   }
-
 
   return (
     <View className="flex-1">
@@ -63,8 +89,10 @@ export default function Account() {
         <ScrollView
           contentContainerStyle={{
             paddingBottom: 180,
-          }}>
-          <View className='flex-1 justify-center items-center p-4'>
+          }}
+          keyboardShouldPersistTaps='handled'
+        >
+          <View className='flex-1 justify-center items-center p-4 pb-[45px]'>
             <BackButton />
 
             <Text className='text-3xl font-bold pt-20'>
@@ -98,15 +126,58 @@ export default function Account() {
                           {new Date(accountData.accountCreation).toLocaleString("sv-SE")}
                         </Text>
                       </View>
-                      <Pressable
-                        className="self-end p-3 mt-4 border-2 rounded-xl border-black bg-orange-100"
-                        onPress={() => handleSignOut()}
-                      >
-                        <Text className="text-xl font-bold">
-                          Logga ut
-                        </Text>
-                      </Pressable>
+                      <View className='mt-6 self-end flex-row'>
+                        <Pressable
+                          className={`p-3 border-2 mr-4 rounded-xl border-black ${showEditing ? 'bg-orange-300' : 'bg-orange-100'}`}
+                          onPress={() => setShowEditing(!showEditing)}
+                        >
+                          <Text className="text-xl font-bold">
+                            Ändra användarnamn
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          className="p-3 border-2 rounded-xl border-black bg-orange-100"
+                          onPress={() => handleSignOut()}
+                        >
+                          <Text className="text-xl font-bold">
+                            Logga ut
+                          </Text>
+                        </Pressable>
+                      </View>
                     </View>
+                    {showEditing
+                      ? <View className='mt-4 p-4 rounded-xl bg-orange-300 border-2 border-black'>
+                        <Text className='font-bold text-xl'>
+                          Nytt användarnamn:
+                        </Text>
+                        <TextInput
+                          className='bg-orange-100 rounded-xl text-center h-20 mt-5 text-xl'
+                          placeholder='Nytt användarnamn...'
+                          id='username'
+                          value={newUsername}
+                          onChangeText={setNewUsername}
+                        />
+                        <View className='flex-row self-end mt-4'>
+                          <Pressable
+                            className="p-3 border-2 rounded-lg mr-2 self-end border-black bg-orange-100"
+                            onPress={updateUsername}
+                          >
+                            <Text className="text-xl font-bold">
+                              Spara
+                            </Text>
+                          </Pressable>
+                          <Pressable
+                            className="p-3 border-2 rounded-lg self-end border-black bg-orange-100"
+                            onPress={() => setShowEditing(!showEditing)}
+                          >
+                            <Text className="text-xl font-bold">
+                              Avbryt
+                            </Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                      : null
+                    }
                   </View>
                   <View className='bg-orange-200 p-4 m-2 rounded-xl'>
                     <Text className='font-bold text-3xl mb-2'>
@@ -200,7 +271,7 @@ export default function Account() {
                             Spela spelet på&nbsp;
                           </Text>
                           <Link
-                            href={"/dinos"}
+                            href={"/game"}
                           >
                             <Text className='text-xl font-bold underline'>
                               Spel-sidan

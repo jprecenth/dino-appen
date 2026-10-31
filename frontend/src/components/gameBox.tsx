@@ -42,7 +42,6 @@ export default function GameBox() {
         }
     }
 
-
     const handleGuess = () => {
         if (guess.trim() === "") {
             alert("Du måste skriva något för att gissa");
@@ -71,7 +70,6 @@ export default function GameBox() {
                 handleGameResult(isCorrect ? points + 1 : points)
             }
         }
-
         setGuess("")
     }
 
@@ -104,7 +102,6 @@ export default function GameBox() {
         setShowResult(false);
         setGameOver(false);
         setGameStart(false)
-
     }
 
     return (
@@ -147,7 +144,7 @@ export default function GameBox() {
                 </View>
             )
                 : gameOver ? (
-                    <View className="w-5/6 items-center justify-between mt-20 rounded-xl aspect-square p-6 bg-orange-200">
+                    <View className="w-5/6 items-center justify-between mt-20 rounded-xl aspect-square p-4 bg-orange-200">
                         <Text className="text-5xl font-kablammo">
                             Resultat
                         </Text>
@@ -160,7 +157,7 @@ export default function GameBox() {
                         </Text>
                         {jwtToken
                             ? <></>
-                            : <Text className="text-xl text-center mt-2 mb-2">
+                            : <Text className="text-xl text-center mb-2">
                                 Logga in eller skapa ett konto för att spara dina spelresultat!
                             </Text>
                         }
@@ -185,8 +182,8 @@ export default function GameBox() {
                     </View>
                 )
                     : (
-                        <View className='w-full mt-10 items-center'>
-                            <View className="flex-row w-3/4 justify-evenly items-center mb-5">
+                        <View className='w-full mt-4 items-center'>
+                            <View className="flex-row w-3/4 justify-evenly items-center mb-2">
                                 <Text className='text-3xl'>
                                     Vem där?
                                 </Text>
@@ -204,7 +201,7 @@ export default function GameBox() {
                                     </Text>
                                 </View>
                             </View>
-                            <View className="bg-orange-200 w-3/4 aspect-square items-center justify-center rounded-xl p-8">
+                            <View className="bg-orange-200 w-3/4 aspect-square items-center justify-center rounded-xl p-4">
                                 <Image
                                     source={dinos[currentIndex].imgsrc}
                                     className="flex-1 w-full"
@@ -221,32 +218,31 @@ export default function GameBox() {
                                     </Text>
                                 )}
                             </View>
-                            <TextInput
-                                className='bg-orange-100 rounded-xl w-3/4 text-center h-20 mt-5 text-xl'
-                                placeholder='Skriv här...'
-                                onChangeText={setGuess}
-                                value={guess}
-                            />
-                            <View className="flex-row mt-5 w-3/4 justify-between">
+                            <View className="flex-row mt-2 w-3/4 justify-between">
                                 <Pressable
-                                    className="p-4 rounded-xl mr-5 bg-orange-100 flex-grow items-center"
+                                    className="p-2 rounded-xl mr-2 bg-orange-100 flex-grow items-center"
                                     onPress={handleGuess}
                                 >
-                                    <Text className="text-2xl">
+                                    <Text className="text-2xl font-bold">
                                         Gissa
                                     </Text>
                                 </Pressable>
                                 <Pressable
-                                    className={`p-4 rounded-xl ${skips === 0 ? `bg-gray-400` : `bg-orange-100`}`}
+                                    className={`p-2 rounded-xl flex-grow ${skips === 0 ? `bg-gray-400` : `bg-orange-100`}`}
                                     onPress={handleSkip}
                                     disabled={disabledGuess}
                                 >
-                                    <Text className="text-xl">
+                                    <Text className="text-xl text-center">
                                         Hoppa över ({skips})
                                     </Text>
                                 </Pressable>
                             </View>
-
+                            <TextInput
+                                className='bg-orange-100 rounded-xl w-3/4 text-center h-20 mt-2 text-xl'
+                                placeholder='Skriv här...'
+                                onChangeText={setGuess}
+                                value={guess}
+                            />
                         </View>
                     )
             }

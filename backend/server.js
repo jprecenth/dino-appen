@@ -35,7 +35,7 @@ async function query(sql, params) {
 
 function requireAuth(req, res, next) {
     const match = /^Bearer (.+)$/.exec(req.get("authorization") ?? "");
-    if (!match) return res.status(401).json({ error: "Missing token." })
+    if (!match) return res.status(401).json({ error: "Token saknas." })
     const token = match[1];
 
     try {
@@ -45,14 +45,14 @@ function requireAuth(req, res, next) {
             audience: "dino-appen-api"
         })
         if (typeof decoded !== "object" || decoded == null || typeof decoded.sub !== "string" || Number(decoded.sub) <= 0 || !Number.isSafeInteger(Number(decoded.sub))) {
-            return res.status(401).send("Invalid token.")
+            return res.status(401).send("Felaktig token.")
         }
         const userID = Number(decoded.sub);
         req.userID = userID;
         next();
     }
     catch (error) {
-        return res.status(401).send("Invalid or expired token.")
+        return res.status(401).send("Din inloggningssession har gått ut. Logga in igen.")
     }
 }
 
@@ -61,8 +61,8 @@ function requireAuth(req, res, next) {
 
 app.post("/users", async (req, res) => {
     const { username, password } = req.body;
-    if (password.length < 8) {
-        return res.status(400).send("The password needs to be 8 or more characters.");
+    if (!password || password.length < 8) {
+        return res.status(400).send("Lösenordet behöver vara minst 8 karaktärer långt.");
     }
     try {
         const passwordHash = await bcrypt.hash(password, 12);
@@ -74,8 +74,13 @@ app.post("/users", async (req, res) => {
         res.send("User created.")
     }
     catch (error) {
+         if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                error: "Användarnamnet är inte tillgängligt."
+            });
+        }
         console.log(error)
-        res.status(500).send("Failed to create user.")
+        res.status(500).send("Kontoregistrering misslyckades.")
     }
 });
 
@@ -87,12 +92,12 @@ app.post("/sessions", async (req, res) => {
         const signInResult = await query(signInSQL, [username])
 
         if (signInResult.length === 0) {
-            return res.status(401).json({ error: "Wrong username or password." })
+            return res.status(401).json({ error: "Fel användarnamn eller lösenord." })
         }
 
         const correctPassword = await bcrypt.compare(password, signInResult[0].passwordHash);
         if (!correctPassword) {
-            return res.status(401).json({ error: "Wrong username or password." })
+            return res.status(401).json({ error: "Fel användarnamn eller lösenord." })
         }
 
         const userID = signInResult[0].userID;
@@ -112,7 +117,7 @@ app.post("/sessions", async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        res.status(500).send("Session could not be verified.")
+        res.status(500).send("Inloggningssessionen kunde inte verifieras.")
     }
 })
 
@@ -127,7 +132,7 @@ app.get("/account", requireAuth, async (req, res) => {
 
         if (userResult.length === 0) {
             return res.status(404).json({
-                error: "No such user found."
+                error: "Kunde inte hitta användare."
             })
         }
         const resultSQL = "SELECT points, created_at, resultID FROM results WHERE userID = ? ORDER BY points DESC";
@@ -145,7 +150,7 @@ app.get("/account", requireAuth, async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        res.status(500).send("Failed to retrieve user information.")
+        res.status(500).send("Hämtning av användarinformation misslyckades.")
     }
 })
 
@@ -155,7 +160,7 @@ app.patch("/account/username", requireAuth, async (req, res) => {
 
     if (typeof newUserName !== "string" || newUserName.trim().length === 0) {
         return res.status(400).json({
-            error: "Username can't be empty."
+            error: "Användarnamnet kan inte vara tomt."
         })
     }
     const username = newUserName.trim();
@@ -164,21 +169,20 @@ app.patch("/account/username", requireAuth, async (req, res) => {
         await query(userSQL, [username, userID])
 
         return res.status(200).json({
-            "message": "Username updated.",
+            "message": "Användarnamn uppdaterat.",
             "username": username,
         })
     }
     catch (error) {
         if (error.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
-                error: "Username is already taken."
+                error: "Användarnamnet är inte tillgängligt."
             });
         }
         console.log(error);
-        res.status(500).send("Failed to retrieve user information.")
+        res.status(500).send("Hämtning av användarinformation misslyckades.")
     }
 })
-
 
 
 //////////////////////////// RESULTS //////////////////////////// 
@@ -201,11 +205,11 @@ app.post("/results", requireAuth, async (req, res) => {
             const singleResultParams = [singleResult.resultID, userID]
             await query(singleResultSQL, singleResultParams)
         }
-        res.send("Result saved.")
+        res.send("Resultat sparades.")
     }
     catch (error) {
         console.log(error)
-        res.status(500).send("Failed to save result.")
+        res.status(500).send("Misslyckades att spara resultat.")
     }
 })
 
@@ -222,7 +226,7 @@ app.get("/results", requireAuth, async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        return res.status(500).send("User could not be verified.")
+        return res.status(500).send("Användaren kunde inte verifieras.")
     }
 })
 
@@ -236,13 +240,13 @@ app.post("/favourites/:dinoID", requireAuth, async (req, res) => {
         const addFavSQL = "INSERT IGNORE INTO favourites (dinoID, userID) VALUES (?, ?)";
         await query(addFavSQL, [dinoID, userID])
         return res.status(200).json({
-            message: "Favourite added."
+            message: "Favorit tillagd."
         })
 
     }
     catch (error) {
         console.log(error);
-        return res.status(500).send("Failed to add to favourites.");
+        return res.status(500).send("Misslyckades att lägga till favorit.");
     }
 });
 
@@ -254,12 +258,12 @@ app.delete("/favourites/:dinoID", requireAuth, async (req, res) => {
         const deleteFavSQL = "DELETE FROM favourites WHERE dinoID = ? AND userID = ?";
         await query(deleteFavSQL, [dinoID, userID])
         return res.status(200).json({
-            message: "Favourite removed."
+            message: "Favorit borttagen."
         })
     }
     catch (error) {
         console.log(error);
-        return res.status(500).send("Failed to remove from favourites.");
+        return res.status(500).send("Misslyckades att ta bort favorit.");
     }
 });
 
@@ -276,7 +280,7 @@ app.get("/favourites", requireAuth, async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        return res.status(500).send("User could not be verified.")
+        return res.status(500).send("Användaren kunde inte verifieras.")
     }
 })
 
