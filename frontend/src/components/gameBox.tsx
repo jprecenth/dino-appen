@@ -1,8 +1,10 @@
 import { dinoList } from "@/assets/types/dinodata";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Image, Pressable, Text, TextInput, View } from "react-native";
+import { useContext, useState } from "react";
+import { Alert, Image, Pressable, Text, TextInput, View } from "react-native";
 import asteroids from '../../assets/images/asteroids.png';
+import { AuthContext } from "../context/AuthContext";
+import { API_URL } from "../config/api";
 
 
 export default function GameBox() {
@@ -18,14 +20,28 @@ export default function GameBox() {
     const [gameOver, setGameOver] = useState(false)
     const router = useRouter();
 
+    const auth = useContext(AuthContext);
+    if (!auth) {
+        throw new Error("Authprovider is missing.");
+    }
+    const [jwtToken] = auth;
 
-    // useEffect(() => {
-    //     if (!gameStart) {
-    //         const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5);
-    //         setDinos(shuffledDinoList);
-    //         setCurrentIndex(0)
-    //     }
-    // }, [gameStart])
+    async function handleGameResult(finalPoints: number) {
+        const data = { points: finalPoints };
+        const response = await fetch(`${API_URL}/results`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${jwtToken}`
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            const error = await response.text();
+            Alert.alert("Ett fel uppstod:", error)
+        }
+    }
+
 
     const handleGuess = () => {
         if (guess.trim() === "") {
@@ -51,6 +67,9 @@ export default function GameBox() {
 
         if (currentIndex === dinos.length - 1) {
             setGameOver(true)
+            if (jwtToken) {
+                handleGameResult(isCorrect ? points + 1 : points)
+            }
         }
 
         setGuess("")
@@ -61,7 +80,15 @@ export default function GameBox() {
             setDisabledGuess(true)
         }
         setSkips(prev => prev - 1)
-        setCurrentIndex(prev => prev + 1)
+        if (currentIndex === dinos.length - 1) {
+            setGameOver(true)
+            if (jwtToken) {
+                handleGameResult(points)
+            }
+        }
+        else {
+            setCurrentIndex(prev => prev + 1)
+        }
         setGuess("");
     }
 
@@ -131,6 +158,12 @@ export default function GameBox() {
                         <Text className="text-2xl">
                             Du fick {points} poäng!
                         </Text>
+                        {jwtToken
+                            ? <></>
+                            : <Text className="text-xl text-center mt-2 mb-2">
+                                Logga in eller skapa ett konto för att spara dina spelresultat!
+                            </Text>
+                        }
                         <View className="flex-row">
                             <Pressable
                                 className="p-4 rounded-xl mr-5 bg-orange-100 flex-grow items-center"

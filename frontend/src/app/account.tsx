@@ -3,14 +3,54 @@ import BackButton from '@/src/components/backButton';
 import Footer from '@/src/components/footer';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
 import emptyheart from '../../assets/images/heart-empty.png';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { API_URL } from '../config/api';
+import type { AccountData } from '@/assets/types/accountData';
 
 export default function Account() {
   const router = useRouter();
-  const gameresults = true;
-  const [signedIn, setSignedIn] = useState(true)
+  const auth = useContext(AuthContext);
+  if (!auth) {
+    throw new Error("Authprovider is missing.");
+  }
+  const [jwtToken, setJwtToken] = auth;
+  const [accountData, setAccountData] = useState<AccountData | null>(null);
+
+  useEffect(() => {
+    async function showAccountDetails() {
+      if (jwtToken) {
+        const response = await fetch(`${API_URL}/account`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${jwtToken}`
+          }
+        },
+        )
+        if (response.ok) {
+          const data = await response.json();
+          setAccountData(data)
+        }
+        else {
+          const error = await response.text();
+          Alert.alert("Ett fel uppstod:", error)
+        }
+      }
+      else {
+        setAccountData(null)
+      }
+    }
+    showAccountDetails()
+  }, [jwtToken])
+
+  function handleSignOut() {
+    setJwtToken("")
+    setAccountData(null);
+    router.replace("/")
+  }
+
 
   return (
     <View className="flex-1">
@@ -27,14 +67,14 @@ export default function Account() {
           <View className='flex-1 justify-center items-center p-4'>
             <BackButton />
 
-            <Text className='font-kablammo text-6xl pt-20'>
+            <Text className='text-3xl font-bold pt-20'>
               Hej
             </Text>
             <Text className='font-kablammo mb-5 text-5xl'>
-              {signedIn ? `Användarnamn!` : `dinoälskare!`}
+              {accountData ? `${accountData.username}` : `dinoälskare`}
             </Text>
             <View className='p-2 w-full'>
-              {signedIn
+              {accountData
                 ?
                 <>
                   <View className='bg-orange-200 p-4 m-2 rounded-xl'>
@@ -47,7 +87,7 @@ export default function Account() {
                           Användarnamn:&nbsp;
                         </Text>
                         <Text className='text-xl'>
-                          TestUser
+                          {accountData.username}
                         </Text>
                       </View>
                       <View className='flex-row'>
@@ -55,10 +95,13 @@ export default function Account() {
                           Konto skapades:&nbsp;
                         </Text>
                         <Text className='text-xl'>
-                          10-10-2026
+                          {new Date(accountData.accountCreation).toLocaleString("sv-SE")}
                         </Text>
                       </View>
-                      <Pressable className="self-end p-3 mt-4 border-2 rounded-xl border-black bg-orange-100">
+                      <Pressable
+                        className="self-end p-3 mt-4 border-2 rounded-xl border-black bg-orange-100"
+                        onPress={() => handleSignOut()}
+                      >
                         <Text className="text-xl font-bold">
                           Logga ut
                         </Text>
@@ -69,28 +112,28 @@ export default function Account() {
                     <Text className='font-bold text-3xl mb-2'>
                       Favorit-dinos
                     </Text>
-                    {dinoList.length > 0
+                    {accountData.favourites.length > 0
                       ?
                       <>
-                      <View className="flex-row flex-wrap">
-                        {dinoList.map((dino) => (
-                          <View 
-                          className="w-1/3 p-2" 
-                          style={{ position: "relative" }}
-                          key={dino.dinoID}
-                          >
-                            <View className="flex-1">
-                              <View className="rounded-xl bg-orange-100 p-4 items-center aspect-square">
-                                <Image
-                                  source={dino.imgsrc}
-                                  className="flex-1"
-                                  resizeMode="contain"
-                                />
+                        <View className="flex-row flex-wrap">
+                          {dinoList.filter((dino) => accountData.favourites.includes(dino.dinoID)).map((dino) => (
+                            <View
+                              className="w-1/3 p-2"
+                              style={{ position: "relative" }}
+                              key={dino.dinoID}
+                            >
+                              <View className="flex-1">
+                                <View className="rounded-xl bg-orange-100 p-4 items-center aspect-square">
+                                  <Image
+                                    source={dino.imgsrc}
+                                    className="flex-1"
+                                    resizeMode="contain"
+                                  />
+                                </View>
                               </View>
                             </View>
-                          </View>
-                        ))}
-                      </View>
+                          ))}
+                        </View>
                         <Link href={"/dinos"} asChild>
                           <Pressable className="self-end p-3 mt-4 border-2 rounded-xl border-black bg-orange-100">
                             <Text className="text-xl font-bold">
@@ -98,7 +141,7 @@ export default function Account() {
                             </Text>
                           </Pressable>
                         </Link>
-                        </>
+                      </>
                       :
                       <View className="items-center">
                         <Image
@@ -127,35 +170,25 @@ export default function Account() {
                     <Text className='font-bold text-3xl mb-2'>
                       Spelstatistik
                     </Text>
-                    {gameresults ?
+                    {accountData.results.length > 0 ?
                       <View className='p-4'>
                         <Text className='text-xl font-bold mb-4'>
                           Bästa resultat:
                         </Text>
-                        <View className='flex-row items-center mb-2'>
-                          <Text className='text-4xl font-kablammo mr-4 p-2 bg-green-400 rounded-xl'>
-                            1.
-                          </Text>
-                          <Text className='text-xl'>
-                            8/8 dinos, 26-10-2026
-                          </Text>
-                        </View>
-                        <View className='flex-row items-center mb-2'>
-                          <Text className='text-4xl font-kablammo mr-4 p-2 bg-yellow-400 rounded-xl'>
-                            2.
-                          </Text>
-                          <Text className='text-xl'>
-                            2/8 dinos, 26-10-2026
-                          </Text>
-                        </View>
-                        <View className='flex-row items-center'>
-                          <Text className='text-4xl font-kablammo mr-4 p-2 bg-red-400 rounded-xl'>
-                            3.
-                          </Text>
-                          <Text className='text-xl'>
-                            1/8 dinos, 26-10-2026
-                          </Text>
-                        </View>
+                        {accountData.results.map(result => (
+                          <View
+                            className='flex-row items-center mb-2'
+                            key={result.resultID}
+                          >
+                            <Text className='font-bold text-xl bg-green-400 mr-4 p-2 rounded-xl'>
+                              {result.points}/{dinoList.length}
+                            </Text>
+                            <Text className='text-xl'>
+                              {new Date(result.created_at).toLocaleString("sv-SE")}
+                            </Text>
+                          </View>
+                        ))
+                        }
                       </View>
                       :
                       <View className='p-4 items-center'>
@@ -183,20 +216,53 @@ export default function Account() {
                 </>
                 :
                 <>
-                  <View className='bg-orange-200 p-4 m-2 rounded-xl'>
-                    <Text className='text-center text-xl mb-2'>
-                      Du måste vara inloggad för att se din kontofinformation!
+                  <View
+                    className='bg-orange-200 p-4 m-2 rounded-xl'>
+                    <Text className='text-center text-xl mb-4'>
+                      Du måste vara inloggad för att se din kontoinformation!
                     </Text>
-                    <Link href={"/login"} asChild>
-                      <Pressable className="self-end p-3 border-2 rounded-xl border-black bg-orange-100">
-                        <Text className="text-xl font-bold">
-                          Logga in
-                        </Text>
-                      </Pressable>
-                    </Link>
+                    <View className='flex-row self-end'>
+                      <Link href={"/login"} asChild>
+                        <Pressable className="mr-4 p-3 border-2 rounded-xl border-black bg-orange-100">
+                          <Text className="text-xl font-bold">
+                            Logga in
+                          </Text>
+                        </Pressable>
+                      </Link>
+                      <Link href={"/register"} asChild>
+                        <Pressable className="p-3 border-2 rounded-xl border-black bg-orange-100">
+
+                          <Text className="text-xl font-bold">
+                            Skapa konto
+                          </Text>
+                        </Pressable>
+                      </Link>
+                    </View>
+
                   </View>
                 </>
               }
+              {/* <View className='bg-orange-100 p-4 m-2 rounded-xl'>
+                <Text className='text-xl font-bold text-center mb-2'>
+                  Dino-appen
+                </Text>
+                <View className='mb-4'>
+                  <Text className='text-lg'>
+                    • Heart icons av Vlad Szirka
+                  </Text>
+                  <Text className='text-lg'>
+                    • Left arrow icons av prinda895
+                  </Text>
+                  <Text className='text-lg'>
+                    • Dinosaur, Fossil, Stone age & Star icons av Magnific
+                  </Text>
+                </View>
+                <Link href={"https://www.flaticon.com/"}>
+                  <Text className='text-center font-bold'>
+                    https://www.flaticon.com/
+                  </Text>
+                </Link>
+              </View> */}
             </View>
           </View>
         </ScrollView>
