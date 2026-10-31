@@ -149,6 +149,38 @@ app.get("/account", requireAuth, async (req, res) => {
     }
 })
 
+app.patch("/account/username", requireAuth, async (req, res) => {
+    const userID = req.userID;
+    const { newUserName } = req.body;
+
+    if (typeof newUserName !== "string" || newUserName.trim().length === 0) {
+        return res.status(400).json({
+            error: "Username can't be empty."
+        })
+    }
+    const username = newUserName.trim();
+    try {
+        const userSQL = "UPDATE users SET username = ? WHERE userID = ?"
+        await query(userSQL, [username, userID])
+
+        return res.status(200).json({
+            "message": "Username updated.",
+            "username": username,
+        })
+    }
+    catch (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                error: "Username is already taken."
+            });
+        }
+        console.log(error);
+        res.status(500).send("Failed to retrieve user information.")
+    }
+})
+
+
+
 //////////////////////////// RESULTS //////////////////////////// 
 
 app.post("/results", requireAuth, async (req, res) => {

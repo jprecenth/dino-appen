@@ -43,7 +43,7 @@ export default function Index() {
     getUsername()
   }, [jwtToken])
 
-
+  console.log(jwtToken);
   function handleSignOut() {
     Alert.alert("Du är nu utloggad!")
     setJwtToken("")
