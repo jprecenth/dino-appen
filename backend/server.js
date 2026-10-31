@@ -100,7 +100,7 @@ app.post("/sessions", async (req, res) => {
             algorithm: "HS256",
             issuer: "dino-appen",
             audience: "dino-appen-api",
-            expiresIn: "15m",
+            expiresIn: "1h",
         });
 
         const newSessionSQL = "INSERT INTO sessions (userID, token) VALUES (?, ?) ON DUPLICATE KEY UPDATE token = VALUES(token)";
