@@ -91,7 +91,7 @@ export default function GameBox() {
     }
 
     const restartGame = () => {
-        const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5);
+        const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5).slice(0, 10);
 
         setDinos(shuffledDinoList);
         setCurrentIndex(0);

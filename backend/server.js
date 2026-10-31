@@ -61,6 +61,13 @@ function requireAuth(req, res, next) {
 
 app.post("/users", async (req, res) => {
     const { username, password } = req.body;
+    const trimmedUsername = username?.trim();
+
+    if (!trimmedUsername) {
+        return res.status(400).json({
+            error: "Användarnamn kan inte vara tomt."
+        })
+    }
     if (!password || password.length < 8) {
         return res.status(400).send("Lösenordet behöver vara minst 8 karaktärer långt.");
     }
@@ -68,13 +75,13 @@ app.post("/users", async (req, res) => {
         const passwordHash = await bcrypt.hash(password, 12);
 
         const createUserSQL = "INSERT INTO users (username, passwordHash) VALUES (?, ?)";
-        const createUserParams = [username, passwordHash];
+        const createUserParams = [trimmedUsername, passwordHash];
         await query(createUserSQL, createUserParams)
 
-        res.send("User created.")
+        res.status(201).send("User created.")
     }
     catch (error) {
-         if (error.code === "ER_DUP_ENTRY") {
+        if (error.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
                 error: "Användarnamnet är inte tillgängligt."
             });
@@ -86,10 +93,16 @@ app.post("/users", async (req, res) => {
 
 app.post("/sessions", async (req, res) => {
     const { username, password } = req.body;
+    const trimmedUsername = username?.trim();
 
+    if (!trimmedUsername) {
+        return res.status(400).json({
+            error: "Användarnamn kan inte vara tomt."
+        })
+    }
     try {
         const signInSQL = "SELECT * FROM users WHERE username = ?";
-        const signInResult = await query(signInSQL, [username])
+        const signInResult = await query(signInSQL, [trimmedUsername])
 
         if (signInResult.length === 0) {
             return res.status(401).json({ error: "Fel användarnamn eller lösenord." })

@@ -11,7 +11,7 @@ export default function Register() {
     const [username, setUsername] = useState("");
 
     async function handleRegistration() {
-        const data = { username, password };
+        const data = { username: username.trim(), password };
         const response = await fetch(`${API_URL}/users`, {
             method: "POST",
             headers: {
@@ -39,28 +39,30 @@ export default function Register() {
                     paddingBottom: 180,
                 }}
                 keyboardShouldPersistTaps='handled'
-                >
+            >
                 <View className='flex-1 justify-center items-center p-4'>
-                    <Text className='font-kablammo text-6xl pt-20 pb-5'>
+                    <Text className='font-kablammo text-6xl pt-20 pb-4'>
                         Skapa konto
                     </Text>
-                    <Image
-                        source={logo}
-                        className="h-40 w-40"
-                    />
-                    <View className='w-3/4'>
-                        <Text className="text-xl mt-4 text-center">
+                    <View className='flex-row w-3/4'>
+                        <Image
+                            source={logo}
+                            className="h-[100px] w-[100px]"
+                        />
+                        <Text className="text-lg ml-2 mt-4 text-center flex-1">
                             Välj ett användarnamn och lösenord för att skapa ett konto.
                         </Text>
+                    </View>
+                    <View className='w-3/4'>
                         <TextInput
-                            className='bg-orange-100 rounded-xl text-center h-20 mt-5 text-xl'
+                            className='bg-orange-100 rounded-xl text-center h-20 mt-4 text-xl'
                             placeholder='Användarnamn'
                             id='username'
                             value={username}
                             onChangeText={setUsername}
                         />
                         <TextInput
-                            className='bg-orange-100 rounded-xl text-center h-20 mt-3 text-xl'
+                            className='bg-orange-100 rounded-xl text-center h-20 mt-2 text-xl'
                             placeholder='Lösenord'
                             id='password'
                             value={password}
@@ -68,9 +70,9 @@ export default function Register() {
                             secureTextEntry={true}
                         />
                     </View>
-                    <View className="flex-row mt-5 w-3/4 justify-between">
+                    <View className="flex-row mt-4 w-3/4 justify-between">
                         <Pressable
-                            className="p-4 rounded-xl mr-5 bg-orange-100 flex-grow items-center"
+                            className="p-4 rounded-xl mr-2 bg-orange-100 flex-grow items-center"
                             onPress={() => handleRegistration()}
                         >
                             <Text className="text-2xl font-bold">
