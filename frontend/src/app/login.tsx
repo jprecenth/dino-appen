@@ -64,6 +64,7 @@ export default function Login() {
                         <TextInput
                             className='bg-orange-100 rounded-xl text-center h-20 mt-4 text-xl'
                             placeholder='Användarnamn'
+                            placeholderTextColor="#8B7355"
                             id='username'
                             value={username}
                             onChangeText={setUsername}
@@ -71,6 +72,7 @@ export default function Login() {
                         <TextInput
                             className='bg-orange-100 rounded-xl text-center h-20 mt-2 text-xl'
                             placeholder='Lösenord'
+                            placeholderTextColor="#8B7355"
                             id='password'
                             value={password}
                             onChangeText={setPassword}

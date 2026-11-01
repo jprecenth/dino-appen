@@ -47,11 +47,6 @@ test("Functional login", async () => {
     expect(response.status).toBe(200)
 })
 
-
-// Logout
-
-// Authentication
-
 // Favourites
 test("Functional adding of favourite", async () => {
     const response = await request(app).post("/favourites/tyrannosaurus").set("Authorization", `Bearer ${token}`)

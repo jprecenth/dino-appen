@@ -3,18 +3,22 @@ import { Image, Pressable, Text, View } from "react-native";
 import book from '../../assets/images/book.png';
 import logo from '../../assets/images/logo-dinosaur.png';
 import star from '../../assets/images/star.png';
-export default function Footer() {
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+export default function Footer() {
     const pathName = usePathname();
+    const insets = useSafeAreaInsets();
 
     return (
         <View>
             {pathName === '/game'
                 ?
-                <View className="flex-row bottom-0 absolute w-full bg-orange-200 justify-between pb-[45px]">
+                <View 
+                style={{ paddingBottom: insets.bottom }}
+                className="flex-row bottom-0 absolute w-full bg-orange-200 justify-evenly">
                     <Link href={'/dinos'} asChild>
                         <Pressable
-                            className='m-6 p-4 ml-6 rounded-xl items-center bg-orange-100'>
+                            className='m-6 p-4 rounded-xl items-center bg-orange-100'>
                             <Image
                                 source={book}
                                 className="h-[60px] w-[60px]"
@@ -23,7 +27,7 @@ export default function Footer() {
                     </Link>
                     <Link href={'/game'} asChild>
                         <Pressable
-                            className='m-6 p-4 ml-6 rounded-xl items-center bg-green-400'>
+                            className='m-6 p-4 rounded-xl items-center bg-green-400'>
                             <Image
                                 source={star}
                                 className="h-[60px] w-[60px]"
@@ -33,7 +37,7 @@ export default function Footer() {
                     </Link>
                     <Link href={'/account'} asChild>
                         <Pressable
-                            className='m-6 p-4 ml-6 rounded-xl items-center bg-orange-100'>
+                            className='m-6 p-4 rounded-xl items-center bg-orange-100'>
                             <Image
                                 source={logo}
                                 className="h-[60px] w-[60px]"
@@ -42,10 +46,12 @@ export default function Footer() {
                     </Link>
                 </View>
                 :
-                <View className="flex-row bottom-0 absolute w-full bg-orange-200 justify-between pb-[45px]">
+                <View 
+                style={{ paddingBottom: insets.bottom }}
+                className="flex-row bottom-0 absolute w-full bg-orange-200 justify-evenly">
                     <Link href={'/dinos'} asChild>
                         <Pressable
-                            className={`m-6 p-4 ml-6 rounded-xl items-center ${pathName === '/dinos'
+                            className={`m-4 p-4 rounded-xl items-center ${pathName === '/dinos'
                                 ? 'bg-green-400'
                                 : 'bg-orange-100'
                                 }`}>
@@ -60,7 +66,7 @@ export default function Footer() {
                     </Link>
                     <Link href={'/game'} asChild>
                         <Pressable
-                            className={`m-6 p-4 ml-6 rounded-xl items-center ${pathName === '/game'
+                            className={`m-4 p-4 rounded-xl items-center ${pathName === '/game'
                                 ? 'bg-green-400'
                                 : 'bg-orange-100'
                                 }`}>
@@ -75,7 +81,7 @@ export default function Footer() {
                     </Link>
                     <Link href={'/account'} asChild>
                         <Pressable
-                            className={`m-6 p-4 ml-6 rounded-xl items-center ${pathName === '/account'
+                            className={`m-4 p-4 rounded-xl items-center ${pathName === '/account'
                                 ? 'bg-green-400'
                                 : 'bg-orange-100'
                                 }`}>
