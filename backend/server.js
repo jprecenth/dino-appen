@@ -208,7 +208,7 @@ app.post("/results", requireAuth, async (req, res) => {
             const singleResultParams = [singleResult.resultID, userID]
             await query(singleResultSQL, singleResultParams)
         }
-        res.send("Resultat sparades.")
+        res.status(201).send("Resultat sparades.")
     }
     catch (error) {
         console.log(error)

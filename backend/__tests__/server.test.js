@@ -53,28 +53,46 @@ test("Functional login", async () => {
 // Authentication
 
 // Favourites
-// test("Functional adding of favourite", async () => {
-//     const data = { dinoID: "tyrannosaurus" }
-//     const response = await request(app).post("/favourites/tyrannosaurus").send(data);
+test("Functional adding of favourite", async () => {
+    const response = await request(app).post("/favourites/tyrannosaurus").set("Authorization", `Bearer ${token}`)
 
-//     expect(response.status).toBe(200)
-// })
+    expect(response.status).toBe(200)
+})
 
-// test("Functional retrieving of favourites", async () => {
-//     const response = await request(app).get("/favourites").send(data);
+test("Functional retrieving of favourites", async () => {
+    const response = await request(app).get("/favourites").set("Authorization", `Bearer ${token}`)
+    
+    expect(response.status).toBe(200)
+    expect(response.body.favourites).toContainEqual({ dinoID: "tyrannosaurus" })
+})
 
-//     expect(response.status).toBe(200)
-// })
+test("Functional removing of favourite", async () => {
+    const response = await request(app).delete("/favourites/tyrannosaurus").set("Authorization", `Bearer ${token}`)
 
-// test("Functional removing of favourite", async () => {
-//     const data = { dinoID: "tyrannosaurus" }
-//     const response = await request(app).delete("/favourites/tyrannosaurus").send(data);
-
-//     expect(response.status).toBe(200)
-// })
+    expect(response.status).toBe(200)
+})
 
 // Results
+test("Functional adding of results", async () => {
+    const data = { points: 5 }
+    const response = await request(app).post("/results").send(data).set("Authorization", `Bearer ${token}`)
+
+    expect(response.status).toBe(201)
+})
+
+test("Functional retrieving of results", async () => {
+    const response = await request(app).get("/results").set("Authorization", `Bearer ${token}`)
+    
+    expect(response.status).toBe(200)
+    expect(response.body.results.some(result => result.points === 5)).toBe(true)
+})
 
 // Updating username
+test("Functional updating of username", async () => {
+    const data = { newUserName: "KERMIT" };
+    const response = await request(app).patch("/account/username").send(data).set("Authorization", `Bearer ${token}`)
 
+    expect(response.status).toBe(200)
+    expect(response.body.username).toBe("KERMIT")
+})
 
