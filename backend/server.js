@@ -1,11 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import mysql from "mysql2/promise"
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import pool from "./db.js";
 
 const app = express();
-const port = process.env.PORT || 3001;
 
 const secret = process.env.JWT_SECRET;
 
@@ -18,14 +17,6 @@ app.use(cors());
 
 app.get("/healthy", (req, res) => {
     res.status(200).send("Port up and running.")
-});
-
-const pool = mysql.createPool({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT),
 });
 
 async function query(sql, params) {
@@ -188,9 +179,8 @@ app.patch("/account/username", requireAuth, async (req, res) => {
     }
     catch (error) {
         if (error.code === "ER_DUP_ENTRY") {
-            return res.status(409).json({
-                error: "Användarnamnet är inte tillgängligt."
-            });
+            return res.status(409).send("Användarnamnet är inte tillgängligt.")
+            
         }
         console.log(error);
         res.status(500).send("Hämtning av användarinformation misslyckades.")
@@ -297,8 +287,5 @@ app.get("/favourites", requireAuth, async (req, res) => {
     }
 })
 
-
-app.listen(port, () => {
-    console.log(`The backend is running on http://localhost:${port}`);
-});
+export default app;
 

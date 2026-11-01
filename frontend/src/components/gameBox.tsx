@@ -120,7 +120,7 @@ export default function GameBox() {
                             <Pressable
                                 className="p-4 rounded-xl mr-5 bg-orange-100 flex-grow items-center"
                                 onPress={() => {
-                                    const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5);
+                                    const shuffledDinoList = [...dinoList].sort(() => Math.random() - 0.5).slice(0, 10);
                                     setDinos(shuffledDinoList);
                                     setCurrentIndex(0)
                                     setGameStart(false)
@@ -189,7 +189,7 @@ export default function GameBox() {
                                 </Text>
                                 <View className="bg-orange-200 p-3 flex-row rounded-xl items-center">
                                     <Text className="text-xl">
-                                        {currentIndex + 1}/{dinoList.length}
+                                        {currentIndex + 1}/10
                                     </Text>
                                 </View>
                                 <View className="bg-orange-200 p-3 flex-row rounded-xl items-center">

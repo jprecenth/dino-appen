@@ -252,7 +252,7 @@ export default function Account() {
                             key={result.resultID}
                           >
                             <Text className='font-bold text-xl bg-green-400 mr-4 p-2 rounded-xl'>
-                              {result.points}/{dinoList.length}
+                              {result.points}/10
                             </Text>
                             <Text className='text-xl'>
                               {new Date(result.created_at).toLocaleString("sv-SE")}
