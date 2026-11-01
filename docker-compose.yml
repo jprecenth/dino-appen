@@ -1,12 +1,4 @@
 services:
-  nextjs:
-    build:
-      context: ./frontend
-      args:
-        NEXT_PUBLIC_API_URL: http://ec2-13-63-161-131.eu-north-1.compute.amazonaws.com:3001
-    ports:
-      - "3000:3000"
-
   express:
     build:
       context: ./backend
