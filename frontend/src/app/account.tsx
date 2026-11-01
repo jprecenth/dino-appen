@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { Alert, Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import emptyheart from '../../assets/images/heart-empty.png';
+import kermit from '../../assets/images/kermit.png';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { API_URL } from '../config/api';
@@ -313,27 +314,39 @@ export default function Account() {
                   </View>
                 </>
               }
-              {/* <View className='bg-orange-100 p-4 m-2 rounded-xl'>
-                <Text className='text-xl font-bold text-center mb-2'>
+              <View className='bg-orange-100 p-4 m-2 rounded-xl'>
+                <Text className='text-lg font-bold text-center'>
                   Dino-appen
                 </Text>
-                <View className='mb-4'>
-                  <Text className='text-lg'>
-                    • Heart icons av Vlad Szirka
-                  </Text>
-                  <Text className='text-lg'>
-                    • Left arrow icons av prinda895
-                  </Text>
-                  <Text className='text-lg'>
-                    • Dinosaur, Fossil, Stone age & Star icons av Magnific
-                  </Text>
+                <View className='flex-row items-center'>
+                  <Image
+                    source={kermit}
+                    className='h-20 w-20'
+                  />
+                  <View className='flex-1 ml-2'>
+                    <View className='flex-row'>
+                      <Text className='text-sm'>
+                        Byggd av&nbsp;
+                      </Text>
+                      <Link href={"https://github.com/jprecenth/dino-appen"}>
+                        <Text className='text-center text-sm font-bold'>
+                          jprecenth
+                        </Text>
+                      </Link>
+                    </View>
+                    <View className='flex-row'>
+                      <Text className='text-sm'>
+                        Ikoner av prinda895, Linseed Studio, Vlad Szirka & Magnific från
+                        <Link href={"https://www.flaticon.com/"}>
+                          <Text className='font-bold text-sm'>
+                            &nbsp;flaticon&nbsp;
+                          </Text>
+                        </Link>
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-                <Link href={"https://www.flaticon.com/"}>
-                  <Text className='text-center font-bold'>
-                    https://www.flaticon.com/
-                  </Text>
-                </Link>
-              </View> */}
+              </View>
             </View>
           </View>
         </ScrollView>
