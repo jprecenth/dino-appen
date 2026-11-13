@@ -1,6 +1,7 @@
 # 🦖 Dino-appen
 
 A dinosaur quiz application built as a school project (for my dino-obsessed nephew). The app allows users to create accounts, take dino quizzes, save favourite dinosaurs, and track their quiz results.
+<img width="1655" height="1042" alt="dinoappen" src="https://github.com/user-attachments/assets/b0971503-b4ec-4d4b-b884-3a91225fea8f" />
 
 ## Features
 
